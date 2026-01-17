@@ -29,48 +29,28 @@ This demo is intended for:
 - Benchmarking retrieval latency at scale
 
 ## Architecture Diagram
-┌────────────────────┐
-│ User Query │
-└─────────┬──────────┘
-│
-▼
-┌────────────────────┐
-│ SentenceTransformer │
-│ (float32 embedding)│
-└─────────┬──────────┘
-│
-▼
-┌────────────────────┐
-│ Binary Quantization │
-│ (ubinary) │
-└─────────┬──────────┘
-│
-▼
-┌──────────────────────────────┐
-│ Binary FAISS Index (in RAM) │
-│ - Exact or IVF Approximate │
-└─────────┬────────────────────┘
-│ top K × multiplier
-▼
-┌──────────────────────────────┐
-│ Lazy Load int8 Embeddings │
-│ (from disk) │
-└─────────┬────────────────────┘
-│
-▼
-┌──────────────────────────────┐
-│ Float32 × int8 Rescoring │
-└─────────┬────────────────────┘
-│
-▼
-┌──────────────────────────────┐
-│ Final Top-K Ranking │
-└─────────┬────────────────────┘
-│
-▼
-┌──────────────────────────────┐
-│ Titles + Text Display (UI) │
-└──────────────────────────────┘
+
+```mermaid
+flowchart TD
+    U[User Query]
+    E[SentenceTransformer<br/>(float32 embedding)]
+    Q[Binary Quantization<br/>(ubinary)]
+    B[Binary FAISS Index<br/>(RAM)]
+    I[Candidate IDs<br/>(Top K × Multiplier)]
+    L[Lazy Load int8 Embeddings<br/>(Disk)]
+    R[Float32 × int8 Rescoring]
+    S[Final Top-K Sorting]
+    O[Titles & Text Display<br/>(Gradio UI)]
+
+    U --> E
+    E --> Q
+    Q --> B
+    B --> I
+    I --> L
+    L --> R
+    R --> S
+    S --> O
+
 ## Retrieval Pipeline
 
 1. **Query embedding**

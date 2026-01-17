@@ -50,7 +50,7 @@ flowchart TD
     L --> R
     R --> S
     S --> O
-
+```
 ## Retrieval Pipeline
 
 1. **Query embedding**

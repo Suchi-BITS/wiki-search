@@ -28,6 +28,49 @@ This demo is intended for:
 - Cost-sensitive search systems
 - Benchmarking retrieval latency at scale
 
+## Architecture Diagram
+┌────────────────────┐
+│ User Query │
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│ SentenceTransformer │
+│ (float32 embedding)│
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│ Binary Quantization │
+│ (ubinary) │
+└─────────┬──────────┘
+│
+▼
+┌──────────────────────────────┐
+│ Binary FAISS Index (in RAM) │
+│ - Exact or IVF Approximate │
+└─────────┬────────────────────┘
+│ top K × multiplier
+▼
+┌──────────────────────────────┐
+│ Lazy Load int8 Embeddings │
+│ (from disk) │
+└─────────┬────────────────────┘
+│
+▼
+┌──────────────────────────────┐
+│ Float32 × int8 Rescoring │
+└─────────┬────────────────────┘
+│
+▼
+┌──────────────────────────────┐
+│ Final Top-K Ranking │
+└─────────┬────────────────────┘
+│
+▼
+┌──────────────────────────────┐
+│ Titles + Text Display (UI) │
+└──────────────────────────────┘
 ## Retrieval Pipeline
 
 1. **Query embedding**
